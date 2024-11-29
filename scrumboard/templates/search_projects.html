@@ -1,0 +1,134 @@
+{% load static %} {% load user_tags %} 
+<div class="add_here row">
+    {% if page.object_list %}
+        {% for project in page.object_list %}
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="card card-developer-meetup">
+                <div class="card-body custom-card-body">
+                    <div class="content-header-right text-md-end col-md-12 col-12 d-md-block">
+                        {% if project.status.status == 'Red' %}
+                            <span class="badge bg-light-danger">{{project.status.status}}</span>
+                        {% elif project.status.status == 'Amber' %}
+                            <span class="badge bg-light-warning">{{project.status.status}}</span>
+                        {% else %}
+                            <span class="badge bg-light-success">{{project.status.status}}</span>
+                        {% endif %}
+                    </div>
+                    <div class="meetup-header d-flex align-items-center">
+                        <div class="meetup-day">
+                            <h6 class="mb-0">{{project.created_on | getDay}}</h6>
+                            <h3 class="mb-0">{{project.created_on | getDate}}</h3>
+                        </div>
+                        <div class="my-auto">
+                            <h4 class="card-title mb-25">{{project.project_name}}</h4>
+                            {% if project.priority.id == 1 %}
+                            <span class="badge badge-light-danger">{{project.priority}}</span>
+                            {% elif project.priority.id == 2 %}
+                            <span class="badge badge-light-warning">{{project.priority}}</span>
+                            {% elif project.priority.id == 3 %}
+                            <span class="badge badge-light-success">{{project.priority}}</span>
+                            {% elif project.priority.id == 4 %}
+                            <span class="badge badge-light-info">{{project.priority}}</span>
+                            {% else %}
+                            <span class="badge badge-light-primary">{{project.priority}}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row meetings">
+                        <div class="avatar bg-light-primary rounded me-1">
+                            <div class="avatar-content">
+                                <i data-feather="calendar" class="avatar-icon font-medium-3"></i>
+                            </div>
+                        </div>
+                        <div class="content-body">
+                            <h6 class="mb-0">{{project.created_on}}</h6>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row meetings">
+                        <div class="avatar bg-light-primary rounded me-1">
+                            <div class="avatar-content">
+                                <i data-feather="cpu" class="avatar-icon font-medium-3"></i>
+                            </div>
+                        </div>
+                        <div class="content-body">
+                            <h6 class="mb-0">{{project.project_type}}</h6>
+                        </div>
+                    </div>
+                    <div class="avatar-group">
+                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="Billy Hopkins" class="avatar pull-up">
+                            <img src="{% static 'app-assets/images/portrait/small/avatar-s-9.jpg' %}" alt="Avatar" width="33" height="33" />
+                        </div>
+                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="Amy Carson" class="avatar pull-up">
+                            <img src="{% static 'app-assets/images/portrait/small/avatar-s-6.jpg' %}" alt="Avatar" width="33" height="33" />
+                        </div>
+                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="Brandon Miles" class="avatar pull-up">
+                            <img src="{% static 'app-assets/images/portrait/small/avatar-s-8.jpg' %}" alt="Avatar" width="33" height="33" />
+                        </div>
+                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="Daisy Weber" class="avatar pull-up">
+                            <img src="{% static 'app-assets/images/portrait/small/avatar-s-20.jpg' %}" alt="Avatar" width="33" height="33" />
+                        </div>
+                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="Jenny Looper" class="avatar pull-up">
+                            <img src="{% static 'app-assets/images/portrait/small/avatar-s-20.jpg' %}" alt="Avatar" width="33" height="33" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-primary round waves-effect custom-btn-padding" onclick="editProject({{project.id}})">Edit</button>
+                    <a href="/view/{{project.id}}" type="button" class="btn btn-outline-primary round waves-effect custom-btn-padding">View</a>
+                    <button type="button" onclick="addTask({{project.id}})" class="btn btn-outline-primary round waves-effect custom-btn-padding">Add Task</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <section id="pagination-positions">
+            <div class="row">
+                <div class="col-xl-12 col-md-12 col-lg-12">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            {% if page.has_previous %}
+                            <li class="page-item prev-item" >
+                                <a href="{% url 'projects' page.previous_page_number %}" class="page-link">
+                                    <i class="feather icon-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item prev-item">
+                                <a class="page-link" href="#">
+                                    <i class="feather icon-chevron-left"></i>
+                                </a>
+                            </li>                
+                            {% endif %}
+                            {% for p in page_range %}
+                                <li class="page-item {% if p == current_page %} active {% endif %}">
+                                    <a href="{% url 'projects' p %}" class="page-link">
+                                        {{ p }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% if page.has_next %}
+                                <li class="page-item next-item" >
+                                    <a href="{% url 'projects' page.next_page_number %} " class="page-link">
+                                        <i class="feather icon-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item next-item"><a class="page-link" href="#">
+                                        <i class="feather icon-chevron-right"></i>
+                                    </a>
+                                </li>               
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        <div class="col-lg-12 col-md-12 col-12">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-primaryw">No Record Found</p>
+                </div>
+            </div>
+        </div>        
+    {% endif %}
+</div>

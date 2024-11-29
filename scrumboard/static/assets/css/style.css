@@ -1,0 +1,83 @@
+/*================================================================================
+	Item Name: Vuexy - Vuejs, HTML & Laravel Admin Dashboard Template
+	Version: 2.0
+	Author: PIXINVENT
+	Author URL: http://www.themeforest.net/user/pixinvent
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+html body{
+    background-color: #dbd8da4f;
+}
+
+.horizontal-menu .header-navbar.navbar-brand-center .navbar-header {
+    position: absolute;
+    left: calc(40% - 56px);
+    padding: 0;
+    z-index: 1000;
+}
+
+.horizontal-layout.navbar-floating:not(.blank-page) .app-content {
+    padding: calc(0rem + 2.5rem* 2 + 1.3rem) 2rem 0 2rem;
+}
+
+.faq-search .card-body {
+    padding: 1rem !important;
+}
+
+.fr {
+    float: right !important;
+}
+
+.mr-10{
+    margin-right: 10px !important;
+}
+
+.custom-card-body {
+    flex: 1 1 auto !important;
+    padding: 1rem 1rem !important;
+}
+
+.breadcrumb {
+    padding: 0.3rem 0.3rem;
+}
+
+.card-header {
+    padding: 0.8rem 0.8rem;
+}
+
+.card-body {
+    padding: 1rem 1rem !important;
+}
+
+.card-footer {
+    padding: 0.8rem 0.8rem;
+}
+
+.custom-btn-padding{
+    padding: 0.5rem 0.8rem !important;
+}
+
+.disNone {
+    display: none !important;
+}
+
+.btn-style{
+    padding: 0.95rem 1rem !important;
+}
+
+.avatar-group .avatar .avatar-content-custom {
+    background-color: #e4e5e7 !important;
+}
+
+.mt-125 {
+    margin-top: 1.25rem !important;
+}
+
+.custom-padding-body {
+    padding: 0 !important;
+}

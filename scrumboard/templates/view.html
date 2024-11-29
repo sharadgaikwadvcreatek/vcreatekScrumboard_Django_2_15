@@ -1,0 +1,509 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% load user_tags %}
+
+{% block vendorstyles %}
+<!-- BEGIN: Vendor CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/vendors.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/extensions/sweetalert2.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/extensions/toastr.min.css' %}">
+<!-- END: Vendor CSS-->
+{% endblock %}
+
+{% block pagestyles %}
+<!-- BEGIN: Page CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/extensions/ext-component-sweet-alerts.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/extensions/ext-component-toastr.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+<!-- END: Page CSS-->
+{% endblock %}
+
+{% block content %}
+<input type="hidden" name="project_id" id="project_id" value="{{ project_id }}" />
+<input type="hidden" name="role" id="role" value="{{ request.session.role }}" />
+<input type="hidden" name="user_id" id="user_id" value="{{ request.user.id }}" />
+
+<div class="col-md-12">
+    <div class="card" >
+        <div class="card-header">
+            <h4 class="card-title" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Project - {{projectDetails.project_name}}</h4>            
+            <div class="content-header-right text-md-end d-md-block">
+                <button type="button" class="btn btn-outline-primary mr-10 btn-style" data-bs-toggle="modal" data-bs-target="#model-add-task" id="add_new_task_button" style="display: none;">
+                    <i data-feather="plus" class="me-25"></i>
+                    <span>Add New Task</span>
+                </button>
+                <a href="/projects" type="button" class="btn btn-outline-warning btn-style" id="project_back_button" >
+                    <i data-feather="arrow-left" class="me-25"></i>
+                </a>
+                <a href="/refresh_filter" type="button" class="btn btn-outline-primary mr-10 btn-style" id="refresh_button" >
+                    <i data-feather="refresh-ccw" class="me-25"></i>
+                </a>
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#model-timeline">
+                    Project Timeline
+                </button>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="radio_options" id="radio_option2" autocomplete="off" checked/>
+                    <label class="btn btn-icon btn-outline-primary view-btn list-view-btn list-view-button" for="radio_option2"><i data-feather="list" class="font-medium-3"></i></label>
+    
+                    <input type="radio" class="btn-check " name="radio_options" id="radio_option1" autocomplete="off"  />
+                    <label class="btn btn-icon btn-outline-primary view-btn grid-view-btn card-view-button" for="radio_option1"><i data-feather="grid" class="font-medium-3"></i></label>
+                </div>
+            </div>
+            
+        </div>
+        <div class="card-body collapse" id="collapseExample">
+            {% csrf_token %}
+            <input type="hidden" name="project_id" value="{{projectDetails.id}}" id="project_id" />
+            <dl class="row">
+                <dt class="col-sm-3">Project Name</dt>
+                <dd class="col-sm-3">{{projectDetails.project_name}}</dd>
+                <dt class="col-sm-3 text-truncate">Project Type</dt>
+                <dd class="col-sm-3">{{projectDetails.project_type}}</dd>
+            </dl>
+            <dl class="row">
+                <dt class="col-sm-3">Priority</dt>
+                <dd class="col-sm-3">
+                    {% if projectDetails.priority.id == 1 %}
+                    <span class="badge badge-light-danger">{{projectDetails.priority}}</span>
+                    {% elif projectDetails.priority.id == 2 %}
+                    <span class="badge badge-light-warning">{{projectDetails.priority}}</span>
+                    {% elif projectDetails.priority.id == 3 %}
+                    <span class="badge badge-light-success">{{projectDetails.priority}}</span>
+                    {% elif projectDetails.priority.id == 4 %}
+                    <span class="badge badge-light-info">{{projectDetails.priority}}</span>
+                    {% else %}
+                    <span class="badge badge-light-primary">{{projectDetails.priority}}</span>
+                    {% endif %}
+                </dd>
+                <dt class="col-sm-3">Request Date</dt>
+                <dd class="col-sm-3">{{projectDetails.request_date}}</dd>
+            </dl>
+            <dl class="row">
+                <dt class="col-sm-3">Start Date</dt>
+                <dd class="col-sm-3">{{projectDetails.start_date}}</dd>
+                <dt class="col-sm-3">Due Date</dt>
+                <dd class="col-sm-3">{{projectDetails.due_date}}</dd>
+            </dl>
+            <dl class="row">
+                <dt class="col-sm-3">Team</dt>
+                <dd class="col-sm-3">{{projectDetails.team}}</dd>
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-3">
+                    {% if projectDetails.status.id == 1 %}
+                    <span class="badge bg-danger">{{projectDetails.status}}</span>
+                    {% elif projectDetails.status.id == 2 %}
+                    <span class="badge bg-warning">{{projectDetails.status}}</span>
+                    {% else %}
+                    <span class="badge bg-success">{{projectDetails.status}}</span>
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<div class="row match-height card-view" style="display: none;">
+    <div class="col-lg-12 col-md-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 c_level_2">
+                        <select class="select2 form-select" name="level_2_f" id="level_2_f">
+                            <option value=""></option>
+                            {% for level_2 in levelTwos %}
+                            <option value="{{level_2.id}}"> {{level_2.level_2}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-4 c_task_status">
+                        <select class="select2 form-select" name="task_status_f" id="task_status_f">
+                            <option value=""></option>
+                            {% for task_status in task_statuses %}
+                            <option value="{{task_status.id}}"> {{task_status.status}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-4 c_project_priority">
+                        <select class="select2 form-select" name="priority_f" id="priority_f_v">
+                            <option value=""></option>
+                            {% for priority in priorities %}
+                            <option value="{{priority.id}}"> {{priority.priority}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                </div>                
+            </div>
+        </div>
+    </div>
+    <div class="add_here match-height row">
+        {% if page.object_list %}
+            {% for task in page.object_list %}
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card card-developer-meetup">
+                    <div class="card-body custom-card-body">
+                        <div class="content-header-right text-md-end col-md-12 col-12 d-md-block mb-1">
+                            {% if task.progress.id == 1 %}
+                                <span class="badge bg-success">{{task.progress.status}}</span>
+                            {% elif task.progress.id == 2 %}
+                                <span class="badge bg-danger">{{task.progress.status}}</span>
+                            {% elif task.progress.id == 3 %}
+                                <span class="badge bg-warning">{{task.progress.status}}</span>
+                            {% elif task.progress.id == 4 %}
+                                <span class="badge bg-info">{{task.progress.status}}</span>
+                            {% elif task.progress.id == 5 %}
+                                <span class="badge bg-primary">{{task.progress.status}}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{task.progress.status}}</span>
+                            {% endif %}
+                        </div>
+                        <div class="meetup-header d-flex align-items-center">
+                            <div class="meetup-day">
+                                <h6 class="mb-0">{{task.created_on | getDay}}</h6>
+                                <h3 class="mb-0">{{task.created_on | getDate}}</h3>
+                            </div>
+                            <div class="my-auto">
+                                <h5 class="card-title mb-25">{{task.level_2}}</h5>
+                                {% if task.priority.id == 1 %}
+                                <span class="badge badge-light-danger">{{task.priority}}</span>
+                                {% elif task.priority.id == 2 %}
+                                <span class="badge badge-light-warning">{{task.priority}}</span>
+                                {% elif task.priority.id == 3 %}
+                                <span class="badge badge-light-success">{{task.priority}}</span>
+                                {% elif task.priority.id == 4 %}
+                                <span class="badge badge-light-info">{{task.priority}}</span>
+                                {% else %}
+                                <span class="badge badge-light-primary">{{task.priority}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row meetings">
+                            <div class="avatar bg-light-primary rounded me-1">
+                                <div class="avatar-content">
+                                    <i data-feather="calendar" class="avatar-icon font-medium-3"></i>
+                                </div>
+                            </div>
+                            <div class="content-body">
+                                <h6 class="mb-0">{{task.created_on}}</h6>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row meetings">
+                            <div class="avatar bg-light-primary rounded me-1">
+                                <div class="avatar-content">
+                                    <i data-feather="cpu" class="avatar-icon font-medium-3"></i>
+                                </div>
+                            </div>
+                            <div class="content-body">
+                                <h6 class="mb-0">{{task.level_3}}</h6>
+                            </div>
+                        </div>
+                        <div class="mt-125">
+                            <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="{{task.assign_to.first_name}} {{task.assign_to.last_name}}" class="avatar pull-up bg-light-primary">
+                                <span class="avatar-content avatar-content-custom">{{task.assign_to.first_name.0|capfirst}}{{task.assign_to.last_name.0|capfirst}}</span>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div class="card-footer">
+                        <a href="javascript:;" class="item-edit mr-10" onclick="viewTask({{task.id}})"><i data-feather="eye"></i></a>
+                        <a href="javascript:;" class="item-edit mr-10" onclick="editTask({{task.id}})"><i data-feather="edit"></i></a>
+                        <a href="javascript:;" class="item-edit mr-10" onclick="addComment({{task.id}})"><i data-feather="message-circle"></i></a>
+                        <a href="javascript:;" class="item-edit mr-10" onclick="changeStatus({{task.id}})"><i data-feather="toggle-right"></i></a>
+                        <a href="javascript:;" class="item-edit" onclick="deleteTask({{task.id}})"><i data-feather="trash-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-lg-12 col-md-12 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-primaryw">No Record Found</p>
+                    </div>
+                </div>
+            </div>        
+        {% endif %}
+    </div>
+</div>
+
+<div class="row list-view">
+    <div class="col-md-12">         
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4 task_level2"></div>
+                        <div class="col-lg-4 task_status"></div>
+                        <div class="col-lg-4 task_priority"></div>
+                        
+                    </div>                
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="dt_basic_table_task table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>id</th>
+                                <th>level 2</th>
+                                <th>level 3</th>
+                                <th>progress</th>
+                                <th>priority</th>
+                                <th>start date</th>
+                                <th>due date</th>
+                                <th>comment</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>        
+    </div>    
+</div>
+
+<div class="modal modal-slide-in fade" id="model-timeline">
+    <div class="modal-dialog sidebar-sm">            
+        <div class="modal-content pt-0">
+            <div class="modal-header mb-1">
+                <h5 class="modal-title" id="model-timelineLabel">Project Timeline</h5>
+            </div>
+            <ul class="timeline">
+                {% for projectTimeline in projectTimelines %}
+                <li class="timeline-item">
+                    <span class="timeline-point timeline-point-indicator"></span>
+                    <div class="timeline-event">
+                        <div class="d-flex justify-content-between flex-sm-row flex-column mb-sm-0 mb-1">
+                            <h6>{{projectTimeline.action}}</h6>
+                            <span class="timeline-event-time">{{projectTimeline.created_on | days_until}}</span>
+                        </div>
+                        <p>{{projectTimeline.details}}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>            
+    </div>
+</div>
+<div class="modal modal-slide-in fade" id="model-add-task">
+    <div class="modal-dialog sidebar-sm">
+        <form action="{% url 'add_task' %}" method="POST" enctype="multipart/form-data" class="add-new-record modal-content pt-0" id="add_new_task">
+            {% csrf_token %}
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
+            <div class="modal-header mb-1">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Task</h5>
+            </div>
+            <div class="modal-body flex-grow-1">
+                <input type="hidden" name="project" class="project" id="project" value="{{projectDetails.id}}">
+                <input type="hidden" name="task_id" class="task_id" id="task_id" value="">
+                <div class="mb-1">
+                    <label class="form-label" for="level_2">Level 2</label>
+                    <select class="select2 form-select" name="level_2" id="level_2">
+                        <option value=""></option>
+                        {% for levelTwo in levelTwos %}
+                        <option value="{{levelTwo.id}}"> {{levelTwo.level_2}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="level_3">Level 3</label>
+                    <input type="text" class="form-control dt-full-name" id="level_3" name="level_3" placeholder="" aria-label="" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="progress">Progress</label>
+                    <select class="select2 form-select" name="progress" id="progress">
+                        <option value=""></option>
+                        {% for task_status in task_statuses %}
+                        <option value="{{task_status.id}}"> {{task_status.status}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="priority">Priority</label>
+                    <select class="select2 form-select" name="priority" id="task_priority">
+                        <option value=""></option>
+                        {% for priority in priorities %}
+                        <option value="{{priority.id}}"> {{priority.priority}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="request_date">Request Date</label>
+                    <input type="text" class="form-control dt-date" name="request_date" id="request_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="start_date">Start Date</label>
+                    <input type="text" class="form-control dt-date" name="start_date" id="start_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="due_date">Due Date</label>
+                    <input type="text" class="form-control dt-date" name="due_date" id="due_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <!-- <div class="mb-1">
+                    <label class="form-label" for="finish_date">Finish Date</label>
+                    <input type="text" class="form-control dt-date" name="finish_date" id="finish_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div> -->
+                {% if request.session.role != 'developer' %}
+                <div class="mb-1">
+                    <label class="form-label" for="assign_to">Assign To</label>
+                    <select class="select2 form-select" name="assign_to" id="assign_to">
+                        <option value=""></option>
+                        {% with teamMembers=projectDetails.team_id|getTeamMemberList %}
+                            {% for teamMember in teamMembers %}
+                            <option value="{{teamMember.user.id}}"> {{teamMember.user.first_name}} {{teamMember.user.last_name}} </option>
+                            {% endfor %}
+                        {% endwith %}
+                    </select>
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary data-submit me-1">Submit</button>
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal fade text-start modal-primary" id="model-view-task" tabindex="-1" aria-labelledby="myModalLabel160" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel160">Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body custom-padding-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>LEVEL 2</td>
+                                <td class="t_level_2">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>LEVEL 3</td>
+                                <td class="t_level_3">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PROGRESS</td>
+                                <td class="t_progress">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PRIORITY</td>
+                                <td class="t_priority">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>START DATE</td>
+                                <td class="t_start_date">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>DUE DATE</td>
+                                <td class="t_due_date">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FINISH DATE</td>
+                                <td class="t_finish_date">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>COMMENTS</td>
+                                <td class="t_comment">:
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ACTION</td>
+                                <td class="t_action">: 
+                                    
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+
+<script src="{% static 'app-assets/vendors/js/extensions/toastr.min.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/extensions/ext-component-toastr.js' %}"></script>
+
+{% if messages %} 
+    {% for message in messages %} 
+        {% if message.tags == 'success'%}
+            <script type="text/javascript">
+                toastr.success("{{message}}")
+            </script>
+            {% elif message.tags == 'info' %}
+            <script type="text/javascript">
+                toastr.info("{{message}}")
+            </script>
+            {% elif message.tags == 'warning' %}
+            <script type="text/javascript">
+                toastr.warning("{{message}}")
+            </script>
+            {% elif message.tags == 'error' %}
+            <script type="text/javascript">
+                toastr.error("{{message}}")
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% endblock %}
+
+{% block vendorscript %}
+<!-- BEGIN: Vendor JS-->
+
+<!-- BEGIN Vendor JS-->
+{% endblock %}
+
+{% block pagevendorscript %}
+<script src="{% static 'app-assets/vendors/js/ui/jquery.sticky.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.checkboxes.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/jszip.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/pdfmake.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/vfs_fonts.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.html5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.print.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/extensions/sweetalert2.all.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/extensions/polyfill.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+{% endblock %}
+
+{% block pagescript %}
+<script src="{% static 'app-assets/js/scripts/tables/table-datatables-basic.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/forms/form-select2.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/extensions/ext-component-sweet-alerts.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/forms/form-validation.js' %}"></script>
+{% endblock %}
+

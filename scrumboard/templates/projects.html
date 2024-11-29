@@ -1,0 +1,459 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% load user_tags %}
+
+{% block vendorstyles %}
+<!-- BEGIN: Vendor CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/vendors.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/extensions/toastr.min.css' %}">
+
+<!-- END: Vendor CSS-->
+{% endblock %}
+
+{% block pagestyles %}
+<!-- BEGIN: Page CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/form-validation.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/forms/pickers/form-flat-pickr.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/extensions/ext-component-toastr.css' %}">
+
+<!-- END: Page CSS-->
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="row breadcrumbs-top">
+    <input type="hidden" name="role" id="role" value="{{ request.session.role }}" />
+    <div class="col-6 mb-1">
+        <h2 class="content-header-title float-start mb-0">Projects</h2>
+        <div class="breadcrumb-wrapper">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/home">Home</a>
+                </li>
+                <li class="breadcrumb-item active">Projects
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="content-header-right text-md-end col-md-12 col-12 d-md-block mb-1">
+            <button type="button" class="btn btn-outline-primary mr-10 btn-style" data-bs-toggle="modal" data-bs-target="#modals-add-project" id="add_new_project_button" style="display: none;">
+                <i data-feather="plus" class="me-25"></i>
+                <span>Add New Project</span>
+            </button>
+            <a href="/refresh_filter" type="button" class="btn btn-outline-primary mr-10 btn-style" id="refresh_button" >
+                <i data-feather="refresh-ccw" class="me-25"></i>
+            </a>
+            <a href="/dashboard" type="button" class="btn btn-outline-success mr-10 btn-style">Dashboard
+            </a>
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="radio_options" id="radio_option2" autocomplete="off" checked/>
+                <label class="btn btn-icon btn-outline-primary view-btn list-view-btn list-view-button" for="radio_option2"><i data-feather="list" class="font-medium-3"></i></label>
+
+                <input type="radio" class="btn-check " name="radio_options" id="radio_option1" autocomplete="off"  />
+                <label class="btn btn-icon btn-outline-primary view-btn grid-view-btn card-view-button" for="radio_option1"><i data-feather="grid" class="font-medium-3"></i></label>
+            </div>
+        </div>
+    </div>  
+</div>
+<div class="row match-height card-view" style="display: none;">
+    <div class="col-lg-12 col-md-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 c_project_type">
+                        <select class="select2 form-select" name="project_type_f" id="project_type_f">
+                            <option value=""></option>
+                            {% for project_type in project_types %}
+                            <option value="{{project_type.id}}"> {{project_type.type}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-4 c_project_priority">
+                        <select class="select2 form-select" name="priority_f" id="priority_f">
+                            <option value=""></option>
+                            {% for priority in priorities %}
+                            <option value="{{priority.id}}"> {{priority.priority}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-4 c_project_status">
+                        <select class="select2 form-select" name="project_status_f" id="project_status_f">
+                            <option value=""></option>
+                            {% for project_status in project_statuses %}
+                            <option value="{{project_status.id}}"> {{project_status.status}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <div class="add_here row">
+        {% if page.object_list %}
+            {% for project in page.object_list %}
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card card-developer-meetup">
+                    <div class="card-body custom-card-body">
+                        <div class="content-header-right text-md-end col-md-12 col-12 d-md-block">
+                            {% if project.status.status == 'Red' %}
+                                <span class="badge bg-light-danger">{{project.status.status}}</span>
+                            {% elif project.status.status == 'Amber' %}
+                                <span class="badge bg-light-warning">{{project.status.status}}</span>
+                            {% else %}
+                                <span class="badge bg-light-success">{{project.status.status}}</span>
+                            {% endif %}
+                        </div>
+                        <div class="meetup-header d-flex align-items-center">
+                            <div class="meetup-day">
+                                <h6 class="mb-0">{{project.created_on | getDay}}</h6>
+                                <h3 class="mb-0">{{project.created_on | getDate}}</h3>
+                            </div>
+                            <div class="my-auto">
+                                <h4 class="card-title mb-25">{{project.project_name}}</h4>
+                                {% if project.priority.id == 1 %}
+                                <span class="badge badge-light-danger">{{project.priority}}</span>
+                                {% elif project.priority.id == 2 %}
+                                <span class="badge badge-light-warning">{{project.priority}}</span>
+                                {% elif project.priority.id == 3 %}
+                                <span class="badge badge-light-success">{{project.priority}}</span>
+                                {% elif project.priority.id == 4 %}
+                                <span class="badge badge-light-info">{{project.priority}}</span>
+                                {% else %}
+                                <span class="badge badge-light-primary">{{project.priority}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row meetings">
+                            <div class="avatar bg-light-primary rounded me-1">
+                                <div class="avatar-content">
+                                    <i data-feather="calendar" class="avatar-icon font-medium-3"></i>
+                                </div>
+                            </div>
+                            <div class="content-body">
+                                <h6 class="mb-0">{{project.created_on}}</h6>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row meetings">
+                            <div class="avatar bg-light-primary rounded me-1">
+                                <div class="avatar-content">
+                                    <i data-feather="cpu" class="avatar-icon font-medium-3"></i>
+                                </div>
+                            </div>
+                            <div class="content-body">
+                                <h6 class="mb-0">{{project.project_type}}</h6>
+                            </div>
+                        </div>
+                        <div class="mt-125">
+                            {% with teamMembers=project.team.id|getTeamMemberList %}
+                                {% for teamMember in teamMembers %}
+                                    <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" title="{{teamMember.user.first_name}} {{teamMember.user.last_name}}" class="avatar pull-up bg-light-primary">
+                                        <span class="avatar-content avatar-content-custom">{{teamMember.user.first_name.0|capfirst}}{{teamMember.user.last_name.0|capfirst}}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>                        
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-outline-primary round waves-effect custom-btn-padding" onclick="editProject({{project.id}})">Edit</button>
+                        <a href="/view/{{project.id}}" type="button" class="btn btn-outline-primary round waves-effect custom-btn-padding">View</a>
+                        <button type="button" onclick="addTask({{project.id}})" class="btn btn-outline-primary round waves-effect custom-btn-padding">Add Task</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <section id="pagination-positions">
+                <div class="row">
+                    <div class="col-xl-12 col-md-12 col-lg-12">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                {% if page.has_previous %}
+                                <li class="page-item prev-item" >
+                                    <a href="{% url 'projects' page.previous_page_number %}" class="page-link">
+                                        <i class="feather icon-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item prev-item">
+                                    <a class="page-link" href="#">
+                                        <i class="feather icon-chevron-left"></i>
+                                    </a>
+                                </li>                
+                                {% endif %}
+                                {% for p in page_range %}
+                                    <li class="page-item {% if p == current_page %} active {% endif %}">
+                                        <a href="{% url 'projects' p %}" class="page-link">
+                                            {{ p }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                {% if page.has_next %}
+                                    <li class="page-item next-item" >
+                                        <a href="{% url 'projects' page.next_page_number %} " class="page-link">
+                                            <i class="feather icon-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item next-item"><a class="page-link" href="#">
+                                            <i class="feather icon-chevron-right"></i>
+                                        </a>
+                                    </li>               
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </section>
+        {% else %}
+            <div class="col-lg-12 col-md-12 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-primaryw">No Record Found</p>
+                    </div>
+                </div>
+            </div>        
+        {% endif %}
+    </div>
+</div>
+
+<section id="basic-datatable" class="list-view">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 project_type"></div>
+                    <div class="col-lg-4 project_priority"></div>
+                    <div class="col-lg-4 project_status"></div>
+                </div>                
+            </div>
+        </div>
+        <div class="card">
+            <table class="datatables-basic table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>id</th>
+                        <th>Project Name</th>
+                        <th>Project Type</th>
+                        <th>Priority</th>
+                        <th>Number of Task</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>    
+</section>
+
+<!-- Modal to add new record -->
+<div class="modal modal-slide-in fade" id="modals-add-project">
+    <div class="modal-dialog sidebar-sm">
+        <form action="{% url 'projects' %}" method="POST" enctype="multipart/form-data" class="add-new-record modal-content pt-0" id="add_new_project">
+            {% csrf_token %}
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>                
+            <div class="modal-header mb-1">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Project</h5>
+            </div>
+            <div class="modal-body flex-grow-1">
+                <input type="hidden" id="project_id" name="project_id" value="" />
+                <div class="mb-1">
+                    <label class="form-label" for="project_name">Project Name</label>
+                    <input type="text" class="form-control dt-full-name" id="project_name" name="project_name" placeholder="" aria-label="" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="project_type">Project Type</label>
+                    <select class="select2 form-select" name="project_type" id="project_type">
+                        <option value=""></option>
+                        {% for project_type in project_types %}
+                        <option value="{{project_type.id}}"> {{project_type.type}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="priority">Priority</label>
+                    <select class="select2 form-select" name="priority" id="priority">
+                        <option value=""></option>
+                        {% for priority in priorities %}
+                        <option value="{{priority.id}}"> {{priority.priority}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="request_date">Request Date</label>
+                    <input type="text" class="form-control dt-date" name="request_date" id="request_date" placeholder="YYYY-MM-DD" aria-label="YYYY-MM-DD" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="start_date">Start Date</label>
+                    <input type="text" class="form-control dt-date" name="start_date" id="start_date" placeholder="YYYY-MM-DD" aria-label="YYYY-MM-DD" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="due_date">Due Date</label>
+                    <input type="text" class="form-control dt-date" name="due_date" id="due_date" placeholder="YYYY-MM-DD" aria-label="YYYY-MM-DD" />
+                </div>
+                <!-- <div class="mb-1">
+                    <label class="form-label" for="finish_date">Finish Date</label>
+                    <input type="text" class="form-control dt-date" name="finish_date" id="finish_date" placeholder="YYYY-MM-DD" aria-label="YYYY-MM-DD" />
+                </div> -->
+                <div class="mb-1">
+                    <label class="form-label" for="Team">Team</label>
+                    <select class="select2 form-select" name="team" id="team">
+                        <option value=""></option>
+                        {% for team in teams %}
+                        <option value="{{team.id}}"> {{team.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary data-submit me-1">Submit</button>
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-slide-in fade" id="model-add-task">
+    <div class="modal-dialog sidebar-sm">
+        <form action="{% url 'add_task' %}" method="POST" enctype="multipart/form-data" class="add-new-record modal-content pt-0" id="add_new_task">
+            {% csrf_token %}
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
+            <div class="modal-header mb-1">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Task</h5>
+            </div>
+            <div class="modal-body flex-grow-1">
+                <input type="hidden" name="project" class="project" id="project" value="">
+                <div class="mb-1">
+                    <label class="form-label" for="level_2">Level 2</label>
+                    <select class="select2 form-select" name="level_2" id="level_2">
+                        <option value=""></option>
+                        {% for levelTwo in levelTwos %}
+                        <option value="{{levelTwo.id}}"> {{levelTwo.level_2}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="level_3">Level 3</label>
+                    <input type="text" class="form-control dt-full-name" id="level_3" name="level_3" placeholder="" aria-label="" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="progress">Progress</label>
+                    <select class="select2 form-select" name="progress" id="progress">
+                        <option value=""></option>
+                        {% for task_status in task_statuses %}
+                        <option value="{{task_status.id}}"> {{task_status.status}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="priority">Priority</label>
+                    <select class="select2 form-select" name="priority" id="task_priority">
+                        <option value=""></option>
+                        {% for priority in priorities %}
+                        <option value="{{priority.id}}"> {{priority.priority}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="request_date">Request Date</label>
+                    <input type="text" class="form-control dt-date" name="request_date" id="request_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="start_date">Start Date</label>
+                    <input type="text" class="form-control dt-date" name="start_date" id="start_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="due_date">Due Date</label>
+                    <input type="text" class="form-control dt-date" name="due_date" id="due_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div>
+                <!-- <div class="mb-1">
+                    <label class="form-label" for="finish_date">Finish Date</label>
+                    <input type="text" class="form-control dt-date" name="finish_date" id="finish_date" placeholder="MM/DD/YYYY" aria-label="MM/DD/YYYY" />
+                </div> -->
+                {% if request.session.role != 'developer' %}
+                <div class="mb-1">
+                    <label class="form-label" for="assign_to">Assign To</label>
+                    <select class="select2 form-select assign_to" name="assign_to" id="assign_to">                        
+                    </select>
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary data-submit me-1">Submit</button>
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+
+<script src="{% static 'app-assets/vendors/js/extensions/toastr.min.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/extensions/ext-component-toastr.js' %}"></script>
+
+{% if messages %} 
+    {% for message in messages %} 
+        {% if message.tags == 'success'%}
+            <script type="text/javascript">
+                toastr.success("{{message}}")
+            </script>
+            {% elif message.tags == 'info' %}
+            <script type="text/javascript">
+                toastr.info("{{message}}")
+            </script>
+            {% elif message.tags == 'warning' %}
+            <script type="text/javascript">
+                toastr.warning("{{message}}")
+            </script>
+            {% elif message.tags == 'error' %}
+            <script type="text/javascript">
+                toastr.error("{{message}}")
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+{% endblock %}
+
+{% block vendorscript %}
+<!-- BEGIN: Vendor JS-->
+
+<!-- BEGIN Vendor JS-->
+{% endblock %}
+
+{% block pagevendorscript %}
+<script src="{% static 'app-assets/vendors/js/ui/jquery.sticky.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.checkboxes.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/jszip.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/pdfmake.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/vfs_fonts.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.html5.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/buttons.print.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js' %}"></script>
+
+
+
+{% endblock %}
+
+{% block pagescript %}
+<script src="{% static 'app-assets/js/scripts/tables/table-datatables-basic.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/forms/form-select2.js' %}"></script>
+<script src="{% static 'app-assets/js/scripts/forms/form-validation.js' %}"></script>
+
+{% endblock %}
+

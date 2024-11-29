@@ -1,0 +1,239 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block vendorstyles %}
+<!-- BEGIN: Vendor CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/vendors.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/charts/apexcharts.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/extensions/toastr.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css' %}">
+<!-- END: Vendor CSS-->
+{% endblock %}
+
+{% block pagestyles %}
+<!-- BEGIN: Page CSS-->
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/core/menu/menu-types/horizontal-menu.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/charts/chart-apex.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/extensions/ext-component-toastr.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-invoice-list.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/page-faq.css' %}">
+<!-- END: Page CSS-->
+{% endblock %}
+
+{% block content %}
+    <section id="faq-search-filter">
+        <div class="card faq-search" style="background-image: url('{% static 'app-assets/images/banner/banner.png' %}')">
+            <div class="card-body text-center">
+                <!-- main title -->
+                <h2 class="text-primary">Scrum it like a Pro</h2>
+
+                <!-- subtitle -->
+                <p class="card-text mb-2">Once stop solution for Project management and Task Tracking</p>
+
+                <!-- search input -->
+            </div>
+        </div>
+    </section>
+    <div class="row">
+        <div class="col-lg-3 col-sm-6 col-12">
+            <a href="/projects/">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="fw-bolder mb-0">{{project_count}}</h2>
+                            <p class="card-text">Projects</p>
+                        </div>
+                        <div class="avatar bg-light-primary p-50 m-0">
+                            <div class="avatar-content">
+                                <i data-feather="cpu" class="font-medium-5"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>            
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{task_count}}</h2>
+                        <p class="card-text">Task</p>
+                    </div>
+                    <div class="avatar bg-light-success p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="server" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_at_risk}}</h2>
+                        <p class="card-text">At Risk</p>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="activity" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_completed_count}}</h2>
+                        <p class="card-text">Completed</p>
+                    </div>
+                    <div class="avatar bg-light-success p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="check" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_in_progress_on_track}}</h2>
+                        <p class="card-text">In Progress - In Track</p>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="align-justify" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_in_progress_watch_count}}</h2>
+                        <p class="card-text">In progress - watch</p>
+                    </div>
+                    <div class="avatar bg-light-warning p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="eye" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_not_started_count}}</h2>
+                        <p class="card-text">Not Started</p>
+                    </div>
+                    <div class="avatar bg-light-danger p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="x-circle" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_dependent_story_count}}</h2>
+                        <p class="card-text">Dependent Story</p>
+                    </div>
+                    <div class="avatar bg-light-warning p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="alert-octagon" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_critical_priority}}</h2>
+                        <p class="card-text">Critical Priority</p>
+                    </div>
+                    <div class="avatar bg-light-danger p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="arrow-up" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_high_priority}}</h2>
+                        <p class="card-text">High Priority</p>
+                    </div>
+                    <div class="avatar bg-light-danger p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="bookmark" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_medium_priority}}</h2>
+                        <p class="card-text">Medium Priority</p>
+                    </div>
+                    <div class="avatar bg-light-warning p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="bar-chart-2" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="fw-bolder mb-0">{{t_low_priority}}</h2>
+                        <p class="card-text">Low Priority</p>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather="arrow-down" class="font-medium-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+    
+{% endblock %}
+
+{% block vendorscript %}
+<!-- BEGIN: Vendor JS-->
+<script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+<!-- BEGIN Vendor JS-->
+{% endblock %}
+
+{% block pagevendorscript %}
+{% endblock %}
+
+{% block pagescript %}
+{% endblock %}
